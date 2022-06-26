@@ -1,0 +1,59 @@
+server:
+    port: 8084
+spring:
+    application:
+        name: api-gateway-service
+    cloud:
+        gateway:
+            routes:
+            -   id: school-info-service
+                uri: lb://school-info-service
+                predicates:
+                -   args[pattern]: /school/**
+                    name: Path
+                filters:
+                  - name: CircuitBreaker
+                    args:
+                      name: school-info-service
+                      fallbackuri: forward:/fallback/schoolInfo
+
+
+            -   id: staff-info-service
+                uri: lb://staff-info-service
+                predicates:
+                -   args[pattern]: /staff/**
+                    name: Path
+                filters:
+                -   name: CircuitBreaker
+                    args:
+                      name: staff-info-service
+                      fallbackuri: forward:/fallback/staffInfo
+
+            -   id: student-info-service
+                uri: lb://student-info-service
+                predicates:
+                -   args[pattern]: /student/**
+                    name: Path
+                filters:
+                -   name: CircuitBreaker
+                    args:
+                      name: student-info-service
+                      fallbackuri: forward:/fallback/studentInfo
+
+#Actuator Configuration
+management:
+  endpoints:
+    web:
+      exposure:
+        include: hystrix.stream, health, info
+
+#Hystrix Configuration
+hystrix:
+  command:
+    fallbackcmd:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 5000
+  dashboard:
+    proxy-stream-allow-list: '*'

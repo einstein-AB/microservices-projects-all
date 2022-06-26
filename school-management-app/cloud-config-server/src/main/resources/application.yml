@@ -1,0 +1,12 @@
+server:
+    port: 8086
+spring:
+    application:
+        name: cloud-config-server
+    cloud:
+      config:
+        server:
+          git:
+            uri: https://github.com/einstein-AB/microservice-cloud-config-server
+
+
